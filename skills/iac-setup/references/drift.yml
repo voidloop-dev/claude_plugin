@@ -17,7 +17,8 @@ jobs:
         env: [dev, staging, prod]
     runs-on: ubuntu-latest
     defaults:
-      run: { working-directory: infra/envs/${{ matrix.env }} }
+      run:
+        working-directory: infra/envs/${{ matrix.env }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
