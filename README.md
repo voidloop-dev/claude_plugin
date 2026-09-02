@@ -11,6 +11,7 @@ error rate stays low.
 
 | Skill | Status | Purpose |
 |---|---|---|
+| `blueprint` | ✅ built | Full up-front plan for any project: deep system design doc (C4, data model, APIs, NFRs, security, deployment), phased delivery plan ordered by risk, and a fine-grained spec for every module in every phase |
 | `repo-bootstrap` | ✅ built | Git/GitHub foundations: `.gitignore`, branch protection, PR template, CODEOWNERS, LICENSE, secret guardrails, README skeleton |
 | `cicd-setup` | ✅ built | GitHub Actions per stack: lint + test + build, `gitleaks` gate, deploy workflows, wire status checks into branch protection |
 | `project-docs` | ✅ built | Fixed templates + update rules for `PROGRESS.md`, `ARCHITECTURE.md`, `MODULES.md`; kept current after each change |
