@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1.7
+# Node/TypeScript service — multi-stage, non-root, cache mounts.
+# Replace digests with current ones: docker buildx imagetools inspect node:20-slim
+
+ARG NODE_IMAGE=node:20.11-slim@sha256:REPLACE_ME
+
+# ---------- builder ----------
+FROM ${NODE_IMAGE} AS builder
+WORKDIR /app
+RUN corepack enable
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm build && pnpm prune --prod
+
+# ---------- runtime ----------
+FROM gcr.io/distroless/nodejs20-debian12@sha256:REPLACE_ME AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+# distroless "nonroot" = uid 65532
+USER nonroot
+COPY --from=builder --chown=nonroot:nonroot /app/node_modules ./node_modules
+COPY --from=builder --chown=nonroot:nonroot /app/dist ./dist
+COPY --from=builder --chown=nonroot:nonroot /app/package.json ./
+EXPOSE 3000
+# distroless has no shell/curl — rely on the orchestrator probe, or ship a tiny
+# healthcheck binary. For plain docker, use one that hits your health route:
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD ["node", "dist/healthcheck.js"]
+CMD ["dist/server.js"]

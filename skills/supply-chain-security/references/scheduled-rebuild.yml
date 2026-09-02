@@ -1,0 +1,51 @@
+# .github/workflows/weekly-rebuild.yml
+# Rebuild + rescan the current release image so upstream OS/lib fixes land even
+# with no code change. Re-tags the same version with a new build.
+name: weekly-rebuild
+
+on:
+  schedule: [{ cron: "0 3 * * 2" }]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4  # -> SHA
+        with: { ref: ${{ github.event.repository.default_branch }} }
+
+      - name: Latest release tag
+        id: tag
+        run: echo "v=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+      - run: git checkout ${{ steps.tag.outputs.v }}
+
+      - name: Rebuild (fresh bases)
+        id: build
+        uses: docker/build-push-action@v6  # -> SHA
+        with:
+          context: .
+          push: true
+          no-cache: true
+          pull: true
+          tags: ghcr.io/${{ github.repository }}:${{ steps.tag.outputs.v }}-rebuild
+
+      - name: Rescan
+        uses: aquasecurity/trivy-action@0.24.0  # -> SHA
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:${{ steps.tag.outputs.v }}-rebuild
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "0"       # report, don't fail the schedule
+          format: sarif
+          output: trivy.sarif
+
+      - uses: github/codeql-action/upload-sarif@v3  # -> SHA
+        with: { sarif_file: trivy.sarif }
+      # Optional: re-sign + re-attest the rebuilt digest, then promote via
+      # deploy-strategies if the scan is clean.
