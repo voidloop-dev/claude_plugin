@@ -20,9 +20,16 @@ to GitHub.
 - [x] `dev-workflow` — SKILL.md + phase prompt blocks
 - [x] `ui-scaffold` — SKILL.md + tokens.css, theme-toggle.tsx, theme.dart, UI.md
 
+## Repo
+
+- Remote: https://github.com/voidloop-dev/claude_plugin
+- `main` = baseline (skills + LICENSE), pushed.
+- `.github/`: `validate.yml` workflow (JSON/frontmatter/YAML checks), PR template,
+  issue templates, CODEOWNERS. `CONTRIBUTING.md` added.
+
 ## Next
 
-1. Push to personal GitHub (needs: `gh` install OR user-created empty repo URL).
+1. Enable branch protection on `main` in GitHub settings (require PR + `validate` check).
 2. Install locally and smoke-test each skill triggers on the right prompt.
 3. Optional: `claude plugin eval` suite.
 4. Optional: dogfood — run `repo-bootstrap` + `cicd-setup` on this very repo.

@@ -1,0 +1,45 @@
+name: Validate plugin
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Plugin manifests are valid JSON
+        run: |
+          for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json; do
+            python3 -c "import json,sys; json.load(open('$f')); print('ok: $f')"
+          done
+
+      - name: Every skill has SKILL.md with name + description frontmatter
+        run: |
+          fail=0
+          for d in skills/*/; do
+            f="${d}SKILL.md"
+            if [ ! -f "$f" ]; then echo "missing $f"; fail=1; continue; fi
+            head -1 "$f" | grep -qx -- '---' || { echo "$f: no frontmatter"; fail=1; }
+            grep -qE '^name:[[:space:]]*\S' "$f"        || { echo "$f: no name:"; fail=1; }
+            grep -qE '^description:[[:space:]]*(\S|>-)'  "$f" || { echo "$f: no description:"; fail=1; }
+          done
+          exit $fail
+
+      - name: Workflow templates parse as YAML
+        run: |
+          pip install pyyaml -q
+          find skills -name '*.yml' -o -name '*.yaml' | while read -r f; do
+            python3 -c "import yaml,sys; yaml.safe_load(open('$f')); print('ok:', '$f')"
+          done

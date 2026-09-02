@@ -26,14 +26,14 @@ error rate stays low.
 5. **Narrow scope + sharp description** — the skill triggers at the right moment only.
 6. **A worked example** in every `SKILL.md`.
 
-## Install (once published to a git repo)
+## Install
 
 ```
-/plugin marketplace add <owner>/<repo>
+/plugin marketplace add voidloop-dev/claude_plugin
 /plugin install pro-product-builder@pro-product-builder-marketplace
 ```
 
-Or point Claude Code at this folder locally via `.claude/settings.json`
+Or point Claude Code at a local clone via `.claude/settings.json`
 `extraKnownMarketplaces`.
 
 ## Layout
