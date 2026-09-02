@@ -1,0 +1,46 @@
+# .github/workflows/terraform-drift.yml — scheduled drift detection
+name: Terraform drift
+
+on:
+  schedule: [{ cron: "0 6 * * *" }]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+
+jobs:
+  drift:
+    strategy:
+      matrix:
+        env: [dev, staging, prod]
+    runs-on: ubuntu-latest
+    defaults:
+      run: { working-directory: infra/envs/${{ matrix.env }} }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/tf-plan-${{ matrix.env }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: "1.9.5" }
+      - run: terraform init -input=false
+      - name: Detect drift
+        id: d
+        run: |
+          set +e
+          terraform plan -input=false -detailed-exitcode -lock=false
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+      - name: Open issue on drift
+        if: steps.d.outputs.code == '2'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              ...context.repo,
+              title: `Infra drift detected: ${{ matrix.env }}`,
+              body: `A scheduled \`terraform plan\` for \`${{ matrix.env }}\` was not empty. Review and reconcile.`,
+              labels: ['infra','drift']
+            });

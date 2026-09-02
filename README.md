@@ -16,6 +16,12 @@ error rate stays low.
 | `project-docs` | ✅ built | Fixed templates + update rules for `PROGRESS.md`, `ARCHITECTURE.md`, `MODULES.md`; kept current after each change |
 | `dev-workflow` | ✅ built | Ordered clarify → design → slice → self-review → test → docs checklist |
 | `ui-scaffold` | ✅ built | Stack-specific UI setup (tokens, theming, a11y); defers visual design to the built-in `design` / `artifact-design` skills |
+| `containerize` | ✅ built | Production Docker image: multi-stage, non-root, digest-pinned, healthcheck, `.dockerignore`, local `docker-compose` stack |
+| `iac-setup` | ✅ built | Terraform/OpenTofu to standard: module layout, remote locked state, per-env isolation, plan-on-PR/apply-on-merge via OIDC, drift detection |
+| `deploy-strategies` | ✅ built | Release process: env promotion of one artifact, rolling/blue-green/canary with health gates + fast rollback, expand/contract migrations, feature flags, semver+changelog |
+| `observability-setup` | ✅ built | Structured logs + RED/USE metrics + OTel traces correlated by trace ID, SLOs & error budgets, symptom-based alerts, dashboards + runbooks |
+| `secrets-and-access` | ✅ built | Secret manager as source of truth, env separation, keyless CI→cloud via OIDC, least-privilege roles, rotation, secret scanning, break-glass |
+| `supply-chain-security` | ✅ built | Lockfile pinning, SHA-pinned CI actions, dep/image/IaC scan gates, Renovate, SBOM, cosign signing + SLSA provenance, verify-on-deploy |
 
 ## Design principles (why this is reliable)
 

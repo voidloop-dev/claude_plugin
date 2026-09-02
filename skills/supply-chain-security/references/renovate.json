@@ -1,0 +1,36 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":dependencyDashboard", "security:openssf-scorecard"],
+  "timezone": "Europe/London",
+  "schedule": ["before 6am on monday"],
+  "pinDigests": true,
+  "lockFileMaintenance": { "enabled": true, "schedule": ["before 6am on monday"] },
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": { "labels": ["security"], "schedule": ["at any time"] },
+  "packageRules": [
+    {
+      "description": "Auto-merge patch & minor once CI is green",
+      "matchUpdateTypes": ["patch", "minor", "pin", "digest"],
+      "automerge": true,
+      "platformAutomerge": true
+    },
+    {
+      "description": "Major updates: review manually",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["deps-major"],
+      "addLabels": ["needs-review"]
+    },
+    {
+      "description": "Group GitHub Actions bumps",
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions",
+      "pinDigests": true
+    },
+    {
+      "description": "Group Docker base image bumps",
+      "matchDatasources": ["docker"],
+      "groupName": "docker base images"
+    }
+  ]
+}

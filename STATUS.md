@@ -9,6 +9,13 @@ worked example) plus reference files. Plugin is its own independent git repo
 (`skill_made_by_claude/`, branch `main`), separate from SabaqAI. Not yet pushed
 to GitHub.
 
+## In progress
+
+- [ ] `blueprint` skill — branch `feat/blueprint` (pushed, NOT merged).
+- [ ] DevOps skill set — branch `feat/devops` (pushed, NOT merged): `containerize`,
+  `iac-setup`, `deploy-strategies`, `observability-setup`, `secrets-and-access`,
+  `supply-chain-security`. Each with SKILL.md + reference files. Awaiting review.
+
 ## Done
 
 - [x] Independent git repo (`git init`), own `.gitignore`

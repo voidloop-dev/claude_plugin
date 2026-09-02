@@ -1,0 +1,70 @@
+# .github/workflows/supply-chain.yml
+# Dependency + repo + image scanning as merge gates. Pin the SHAs before use.
+name: supply-chain
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule: [{ cron: "0 4 * * 1" }]   # weekly re-scan of main
+
+concurrency:
+  group: sc-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4  # -> pin to SHA
+      - name: OSV scan (fails on fixable HIGH/CRITICAL)
+        uses: google/osv-scanner-action@v1  # -> pin to SHA
+        with:
+          scan-args: |-
+            --lockfile=./pnpm-lock.yaml
+            --fail-on-vuln
+
+  repo-config-and-secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Trivy config + secret + license scan
+        uses: aquasecurity/trivy-action@0.24.0  # -> pin to SHA
+        with:
+          scan-type: fs
+          scanners: misconfig,secret,license
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+      - name: gitleaks (history)
+        uses: gitleaks/gitleaks-action@v2  # -> pin to SHA
+
+  actions-pinning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail on unpinned actions
+        run: |
+          if grep -rnE 'uses:\s+[^@]+@(v?[0-9]+([.][0-9]+)*|main|master)\s*$' .github/; then
+            echo "::error::Pin the above actions to a commit SHA"; exit 1
+          fi
+
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t app:scan .
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@0.24.0  # -> pin to SHA
+        with:
+          image-ref: app:scan
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true

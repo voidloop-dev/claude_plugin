@@ -1,0 +1,63 @@
+# Add to the release/publish workflow (after the image is pushed by digest).
+# Keyless signing via GitHub OIDC — no cosign keys to manage.
+name: release-attest
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write      # attach SBOM to the release
+  packages: write      # push attestations to GHCR
+  id-token: write      # cosign keyless / attestations
+
+jobs:
+  attest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # -> SHA
+
+      - name: Build & push (by digest)
+        id: build
+        uses: docker/build-push-action@v6  # -> SHA
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+
+      - name: Generate SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0  # -> SHA
+        with:
+          image: ghcr.io/${{ github.repository }}@${{ steps.build.outputs.digest }}
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+
+      - name: Attach SBOM to GitHub Release
+        uses: softprops/action-gh-release@v2  # -> SHA
+        with:
+          files: sbom.cdx.json
+
+      - name: Sign the image (keyless)
+        uses: sigstore/cosign-installer@v3  # -> SHA
+      - run: cosign sign --yes ghcr.io/${{ github.repository }}@${{ steps.build.outputs.digest }}
+
+      - name: SLSA build provenance attestation
+        uses: actions/attest-build-provenance@v1  # -> SHA
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: SBOM attestation
+        uses: actions/attest-sbom@v1  # -> SHA
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: sbom.cdx.json
+          push-to-registry: true
+
+# Verify on deploy:
+#   cosign verify ghcr.io/OWNER/REPO@DIGEST \
+#     --certificate-identity-regexp "https://github.com/OWNER/REPO/.*" \
+#     --certificate-oidc-issuer https://token.actions.githubusercontent.com
+#   cosign verify-attestation --type slsaprovenance ... (same identity flags)
