@@ -1,0 +1,16 @@
+# ---- apple (ios / macos) ----
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+Pods/
+Carthage/Build/
+.swiftpm/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM

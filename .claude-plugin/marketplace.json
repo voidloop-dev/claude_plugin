@@ -1,0 +1,11 @@
+{
+  "name": "pro-product-builder-marketplace",
+  "owner": { "name": "Muhammad Hasnain" },
+  "plugins": [
+    {
+      "name": "pro-product-builder",
+      "source": "./",
+      "description": "Senior-developer skills for standing up and shipping professional products."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+# .github/workflows/deploy-production.yml — Netlify
+# Secrets required: NETLIFY_AUTH_TOKEN, NETLIFY_SITE_ID
+name: Deploy (production)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: npx netlify-cli deploy --prod --dir=dist
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

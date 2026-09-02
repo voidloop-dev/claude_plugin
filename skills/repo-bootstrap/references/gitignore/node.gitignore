@@ -1,0 +1,25 @@
+# ---- node ----
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Build output
+dist/
+build/
+out/
+lib-cov/
+*.tsbuildinfo
+
+# Package manager
+.npm/
+.eslintcache
+.stylelintcache
+
+# Framework caches
+.turbo/
+.parcel-cache/
+.vite/

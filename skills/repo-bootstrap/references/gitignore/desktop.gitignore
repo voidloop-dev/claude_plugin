@@ -1,0 +1,19 @@
+# ---- desktop (electron / tauri) ----
+# Electron
+out/
+release/
+app/dist/
+dist_electron/
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# Installers / signing
+*.dmg
+*.exe
+*.msi
+*.AppImage
+*.deb
+*.rpm
+*.snap

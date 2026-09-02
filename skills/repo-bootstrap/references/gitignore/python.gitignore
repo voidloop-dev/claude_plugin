@@ -1,0 +1,31 @@
+# ---- python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+.installed.cfg
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# Poetry / PDM / pipenv keep lock files tracked; ignore local venvs only
+.pdm-python

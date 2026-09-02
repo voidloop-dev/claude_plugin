@@ -1,0 +1,6 @@
+{
+  "name": "pro-product-builder",
+  "version": "0.1.0",
+  "description": "Skills that make Claude Code work like a senior developer when standing up and shipping professional products: repo bootstrap, CI/CD, project docs, dev workflow, and UI scaffolding.",
+  "author": { "name": "Muhammad Hasnain" }
+}

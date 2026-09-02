@@ -1,0 +1,17 @@
+# ---- android / jvm ----
+*.iml
+.gradle/
+local.properties
+.idea/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+release/
+keystore.properties
+*.jks
+*.keystore

@@ -1,0 +1,45 @@
+# .github/workflows/deploy-production.yml — Vercel
+# Secrets required (gh secret set NAME):
+#   VERCEL_TOKEN       -> Vercel account settings > Tokens
+#   VERCEL_ORG_ID      -> `vercel link` then cat .vercel/project.json
+#   VERCEL_PROJECT_ID  -> same file
+name: Deploy (production)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Deploy
+        id: deploy
+        run: |
+          npm i -g vercel@latest
+          url=$(vercel deploy --prod --yes --token "$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

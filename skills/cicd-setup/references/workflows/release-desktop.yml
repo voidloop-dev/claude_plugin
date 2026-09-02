@@ -1,0 +1,53 @@
+# .github/workflows/release-desktop.yml — Electron/Tauri installers, matrix build
+# Triggered by pushing a version tag. Publishes installers to a GitHub Release.
+name: Release desktop
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # create the release + upload assets
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Electron (electron-builder):
+      - run: pnpm build && pnpm exec electron-builder --publish never
+      # Code signing: add CSC_LINK / CSC_KEY_PASSWORD (mac), and
+      # WIN_CSC_LINK / WIN_CSC_KEY_PASSWORD (win) as secrets when ready.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.os }}
+          path: |
+            dist/*.dmg
+            dist/*.exe
+            dist/*.AppImage
+            dist/*.deb
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true

@@ -1,0 +1,9 @@
+# Every file needs a review from an owner before merge.
+# More specific rules override earlier ones. Add per-area owners as the team grows.
+
+*                       @{{OWNER}}
+
+# Examples:
+# /infra/                @{{OWNER}} @ops-team
+# /src/payments/         @payments-lead
+# *.md                   @docs-team

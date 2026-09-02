@@ -1,0 +1,31 @@
+# .github/workflows/deploy-eas.yml — React Native / Expo via EAS
+# Secret required: EXPO_TOKEN  (expo.dev > account > access tokens)
+name: EAS build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: EAS build profile
+        default: production
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: npm }
+      - run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: eas build --non-interactive --profile ${{ inputs.profile || 'production' }} --platform all

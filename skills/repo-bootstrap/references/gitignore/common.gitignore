@@ -1,0 +1,49 @@
+# ---- common ----
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editors / IDEs
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.shared.json
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Secrets & local config
+.env
+.env.*
+!.env.example
+*.local
+secrets.*
+credentials.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+
+# Logs & temp
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+tmp/
+temp/
+.cache/
+
+# Coverage / test output
+coverage/
+.nyc_output/
