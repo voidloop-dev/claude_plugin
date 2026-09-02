@@ -9,6 +9,12 @@ worked example) plus reference files. Plugin is its own independent git repo
 (`skill_made_by_claude/`, branch `main`), separate from SabaqAI. Not yet pushed
 to GitHub.
 
+## In progress
+
+- [ ] `blueprint` skill on branch `feat/blueprint` (pushed, NOT merged) —
+  SYSTEM_DESIGN + DELIVERY_PLAN + per-module MODULE_SPEC + REQUIREMENTS +
+  nfr-checklist templates. Awaiting user review before merge.
+
 ## Done
 
 - [x] Independent git repo (`git init`), own `.gitignore`
